@@ -1,0 +1,63 @@
+From aa86e513562edbac89f2b5fb9ad7b3e640994cc0 Mon Sep 17 00:00:00 2001
+From: turmary <turmary@126.com>
+Date: Wed, 26 Jan 2022 23:42:41 +0800
+Subject: [PATCH] Update: reduce u-boot-spl & u-boot-tpl depends
+
+---
+ Makefile              |  2 +-
+ arch/arm/dts/Makefile | 26 +-------------------------
+ 2 files changed, 2 insertions(+), 26 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 2ab9c53..597b787 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1133,7 +1133,7 @@ endif
+ PHONY += dtbs
+ dtbs: dts/dt.dtb
+ 	@:
+-dts/dt.dtb: u-boot
++dts/dt.dtb: tools
+ 	$(Q)$(MAKE) $(build)=dts dtbs
+ 
+ quiet_cmd_copy = COPY    $@
+diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
+index 9fb3868..17de0ca 100644
+--- a/arch/arm/dts/Makefile
++++ b/arch/arm/dts/Makefile
+@@ -120,31 +120,7 @@ dtb-$(CONFIG_ROCKCHIP_RK3368) += \
+ 	rk3368-px5-evb.dtb \
+ 
+ dtb-$(CONFIG_ROCKCHIP_RK3399) += \
+-	rk3399-evb.dtb \
+-	rk3399-ficus.dtb \
+-	rk3399-firefly.dtb \
+-	rk3399-gru-bob.dtb \
+-	rk3399-khadas-edge.dtb \
+-	rk3399-khadas-edge-captain.dtb \
+-	rk3399-khadas-edge-v.dtb \
+-	rk3399-leez-p710.dtb \
+-	rk3399-nanopc-t4.dtb \
+-	rk3399-nanopi-m4.dtb \
+-	rk3399-nanopi-m4-2gb.dtb \
+-	rk3399-nanopi-m4b.dtb \
+-	rk3399-nanopi-neo4.dtb \
+-	rk3399-nanopi-r4s.dtb \
+-	rk3399-orangepi.dtb \
+-	rk3399-pinebook-pro.dtb \
+-	rk3399-puma-haikou.dtb \
+-	rk3399-roc-pc.dtb \
+-	rk3399-roc-pc-mezzanine.dtb \
+-	rk3399-rock-pi-4a.dtb \
+-	rk3399-rock-pi-4b.dtb \
+-	rk3399-rock-pi-4c.dtb \
+-	rk3399-rock960.dtb \
+-	rk3399-rockpro64.dtb \
+-	rk3399pro-rock-pi-n10.dtb
++	rk3399-firefly.dtb
+ 
+ dtb-$(CONFIG_ROCKCHIP_RV1108) += \
+ 	rv1108-elgin-r1.dtb \
+-- 
+2.7.4
+
