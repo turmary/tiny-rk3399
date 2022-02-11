@@ -187,4 +187,7 @@ for i in $(echo ${!includes[@]} | sort); do
 done
 
 find $PTH_DIR/ -type f -size 0 -exec rm -f {} \;
+[ -d $PTH_DIR/arch/arm/include/asm/arch ] || {
+	(cd $PTH_DIR/arch/arm/include/asm; ln -sr arch-rk3399 arch)
+}
 
