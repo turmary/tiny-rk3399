@@ -12,8 +12,8 @@
 
 set -o nounset
 
-CMD=$(realpath $0)
-PTH_DIR=`dirname $CMD`
+CMD=$(realpath "$0")
+PTH_DIR=$(dirname "$CMD")
 
 files=
 
@@ -130,50 +130,51 @@ files="${files} include/generated/generic-asm-offsets.h"
 # exit 0
 
 function copy_file() {
-	full=$(realpath --relative-to=. $1)
+	full=$(realpath --relative-to=. "$1")
 
-	[ -f $PTH_DIR/$full ] || {
-		echo $full --\> $PTH_DIR/$full
-		cp -a --parents $full $PTH_DIR
+	[ -f "$PTH_DIR/$full" ] || {
+		echo "$full" --\> "$PTH_DIR/$full"
+		cp -a --parents "$full" "$PTH_DIR"
 	}
 }
 
 declare -A includes
 
+# shellcheck disable=SC2154
 includes["include/host_arch.h"]=1
 
 for i in $files; do
-	name=`basename $i`
-	dir=`dirname $i`
+	name=$(basename "$i")
+	dir=$(dirname "$i")
 	dir1=${dir#*/}
 
-	echo ... $dir/$name
+	echo ... "$dir/$name"
 
-	[ -s $dir/Makefile ] && copy_file $dir/Makefile
-	[ -s $dir1/Makefile ] && copy_file $dir1/Makefile
-	# [ -s $dir/Kconfig ] && copy_file $dir/Kconfig
+	[ -s "$dir/Makefile" ] && copy_file "$dir/Makefile"
+	[ -s "$dir1/Makefile" ] && copy_file "$dir1/Makefile"
+	# [ -s "$dir/Kconfig" ] && copy_file "$dir/Kconfig"
 
 	[ "${name:0-2}" = ".o" -o "${name:0-4}" = ".dtb" ] || {
-		[ -s $dir/$name ] && copy_file $dir/$name
+		[ -s "$dir/$name" ] && copy_file "$dir/$name"
 		continue
 	}
 
 	[ "${name}" = "built-in.o" ] && continue
 
 	mn=${name%.o}
-	[ "$mn" == $name ] && mn=${name%.dtb}
+	[ "$mn" == "$name" ] && mn=${name%.dtb}
 
 	srcf=""
-	[ -s $dir/$mn.c ] && srcf=$dir/$mn.c
-	[ -s $dir/$mn.S ] && srcf=$dir/$mn.S
-	[ -s $dir/$mn.dts ] && srcf=$dir/$mn.dts
-	[ -s $dir1/$mn.c ] && srcf=$dir1/$mn.c
-	[ -s $dir1/$mn.S ] && srcf=$dir1/$mn.S
+	[ -s "$dir/$mn.c" ] && srcf="$dir/$mn.c"
+	[ -s "$dir/$mn.S" ] && srcf="$dir/$mn.S"
+	[ -s "$dir/$mn.dts" ] && srcf="$dir/$mn.dts"
+	[ -s "$dir1/$mn.c" ] && srcf="$dir1/$mn.c"
+	[ -s "$dir1/$mn.S" ] && srcf="$dir1/$mn.S"
 	[ -n "$srcf" ] && {
-		[ -f "$srcf" ] && copy_file $srcf
+		[ -f "$srcf" ] && copy_file "$srcf"
 
-		[ -s $dir/.$name.cmd ] && {
-			for d in $(make -f $PTH_DIR/retrieve_dep.make OBJF=$i $i); do
+		[ -s "$dir/.$name.cmd" ] && {
+			for d in $(make -f "$PTH_DIR/retrieve_dep.make" OBJF="$i" "$i"); do
 				includes["$d"]=1
 			done
 		}
@@ -181,13 +182,13 @@ for i in $files; do
 done
 
 echo "### INCLUDES"
-for i in $(echo ${!includes[@]} | sort); do
+for i in $(echo "${!includes[@]}" | sort); do
 	[ "${i:0:1}" = "/" ] && continue
-	copy_file $i
+	copy_file "$i"
 done
 
-find $PTH_DIR/ -type f -size 0 -exec rm -f {} \;
-[ -d $PTH_DIR/arch/arm/include/asm/arch ] || {
-	(cd $PTH_DIR/arch/arm/include/asm; ln -sr arch-rk3399 arch)
+find "$PTH_DIR/" -type f -size 0 -exec rm -f {} \;
+[ -d "$PTH_DIR/arch/arm/include/asm/arch" ] || {
+	(cd "$PTH_DIR/arch/arm/include/asm"; ln -sr arch-rk3399 arch)
 }
 
