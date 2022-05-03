@@ -142,7 +142,7 @@ function copy_file() {
 	}
 }
 
-declare -A includes
+declare -A includes includes2
 
 # shellcheck disable=SC2154
 includes["include/host_arch.h"]=1
@@ -186,7 +186,12 @@ for i in $files; do
 done
 
 echo "### INCLUDES"
-for i in $(echo "${!includes[@]}" | sort); do
+# translate to real path
+for d in $(echo "${!includes[@]}"); do
+	d=$(realpath --relative-to=. "$d")
+	includes2["$d"]=1
+done
+for i in $(echo "${!includes2[@]}" | tr ' ' '\n' | sort); do
 	[ "${i:0:1}" = "/" ] && continue
 	copy_file "$i"
 done
