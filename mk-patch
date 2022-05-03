@@ -27,6 +27,7 @@ files=
 files="${files} $(find scripts -name '*.o' )"
 files="${files} $(find tools   -name '*.o' )"
 files="${files} include/trace.h"
+files="${files} include/linux/kconfig.h"
 
 # *PART2*
 files="${files} $(find tpl -name '*.o' )"
@@ -50,7 +51,7 @@ files="${files} $(find spl -name '*.o' )"
 files="${files} include/u-boot/u-boot.lds.h"
 
 
-files="${files} arch/arm/dts/rk3399-firefly.dtb"
+files="${files} $(find arch/arm/dts -name "*\.dtb")"
 
 files="${files} scripts/Kbuild.include"
 files="${files} scripts/Kconfig.include"
@@ -105,9 +106,11 @@ files="${files} configs/firefly-rk3399_defconfig"
 # files="${files} board/rockchip/evb_rk3399/Kconfig"
 # files="${files} common/Kconfig.boot"
 files="${files} arch/arm/cpu/armv8/u-boot.lds"
-files="${files} arch/arm/cpu/armv8/u-boot-spl.lds"
+# files="${files} arch/arm/cpu/armv8/u-boot-spl.lds"
 # files="${files} arch/arm/lib/crt0_aarch64_efi.S"
 # files="${files} arch/arm/lib/elf_aarch64_efi.lds"
+# LDSCRIPT
+files="${files} $(sed -nre 's/CONFIG_.*_LDSCRIPT="([^"]*)"/\1/gp;' .config)"
 
 # Extra tools
 files="${files} tools/gen_eth_addr.c"
@@ -131,10 +134,11 @@ files="${files} include/generated/generic-asm-offsets.h"
 
 function copy_file() {
 	full=$(realpath --relative-to=. "$1")
+	[ -s "$full" ] || return 0
 
 	[ -f "$PTH_DIR/$full" ] || {
+		cp -a --parents "$full" "$PTH_DIR" && \
 		echo "$full" --\> "$PTH_DIR/$full"
-		cp -a --parents "$full" "$PTH_DIR"
 	}
 }
 
@@ -187,8 +191,14 @@ for i in $(echo "${!includes[@]}" | sort); do
 	copy_file "$i"
 done
 
-find "$PTH_DIR/" -type f -size 0 -exec rm -f {} \;
+# find "$PTH_DIR/" -type f -size 0 -exec rm -f {} \;
 [ -d "$PTH_DIR/arch/arm/include/asm/arch" ] || {
-	(cd "$PTH_DIR/arch/arm/include/asm"; ln -sr arch-rk3399 arch)
+	# (cd "$PTH_DIR/arch/arm/include/asm"; ln -sr arch-rk3399 arch)
+	cp -a --parents arch/arm/include/asm/arch "$PTH_DIR"
 }
+
+touch "$PTH_DIR/.config"
+touch "$PTH_DIR/include/config/auto.conf"
+touch "$PTH_DIR/include/config/auto.conf.cmd"
+
 
