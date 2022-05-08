@@ -1,0 +1,53 @@
+From b97f9ea88f0bf7fe9d0cc9c600fa274cd9afa6cf Mon Sep 17 00:00:00 2001
+From: turmary <turmary@126.com>
+Date: Wed, 4 May 2022 10:58:26 +0800
+Subject: [PATCH 2/2] Update: reduce sed statement for MK_ARCH
+
+---
+ Makefile             | 7 ++++---
+ scripts/Makefile.spl | 4 ++--
+ 2 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 597b787..dedea38 100644
+--- a/Makefile
++++ b/Makefile
+@@ -22,7 +22,8 @@ include include/host_arch.h
+ ifeq ("", "$(CROSS_COMPILE)")
+   MK_ARCH="${shell uname -m}"
+ else
+-  MK_ARCH="${shell echo $(CROSS_COMPILE) | sed -n 's/^\s*\([^\/]*\/\)*\([^-]*\)-\S*/\2/p'}"
++  MK_ARCH="${shell echo $(CROSS_COMPILE) | sed -r 's,^\s*([^/]*/)*([^-]*)-\S*,\2,g'}"
++  # $(info MK_ARCH=${MK_ARCH} GOALS=${MAKECMDGOALS} LEVEL=${MAKELEVEL} LIST="${MAKEFILE_LIST}")
+ endif
+ unexport HOST_ARCH
+ ifeq ("x86_64", $(MK_ARCH))
+@@ -878,8 +879,8 @@ export PLATFORM_LIBGCC
+ LDPPFLAGS += \
+ 	-include $(srctree)/include/u-boot/u-boot.lds.h \
+ 	-DCPUDIR=$(CPUDIR) \
+-	$(shell $(LD) --version | \
+-	  sed -ne 's/GNU ld version \([0-9][0-9]*\)\.\([0-9][0-9]*\).*/-DLD_MAJOR=\1 -DLD_MINOR=\2/p')
++	${shell $(LD) -v | \
++	  sed -ne 's/G.*\(version\|([^)]\+)\) \([0-9]\+\)\.\([0-9]\+\).*/-DLD_MAJOR=\2 -DLD_MINOR=\3/p'}
+ 
+ #########################################################################
+ #########################################################################
+diff --git a/scripts/Makefile.spl b/scripts/Makefile.spl
+index 5be1a9b..10f869c 100644
+--- a/scripts/Makefile.spl
++++ b/scripts/Makefile.spl
+@@ -178,8 +178,8 @@ LDPPFLAGS += \
+ 	-include $(srctree)/include/u-boot/u-boot.lds.h \
+ 	-include $(objtree)/include/config.h \
+ 	-DCPUDIR=$(CPUDIR) \
+-	$(shell $(LD) --version | \
+-	  sed -ne 's/GNU ld version \([0-9][0-9]*\)\.\([0-9][0-9]*\).*/-DLD_MAJOR=\1 -DLD_MINOR=\2/p')
++	${shell $(LD) -v | \
++	  sed -ne 's/G.*\(version\|([^)]\+)\) \([0-9]\+\)\.\([0-9]\+\).*/-DLD_MAJOR=\2 -DLD_MINOR=\3/p'}
+ 
+ # Turn various CONFIG symbols into IMAGE symbols for easy reuse of
+ # the scripts between SPL and TPL.
+-- 
+2.7.4
+

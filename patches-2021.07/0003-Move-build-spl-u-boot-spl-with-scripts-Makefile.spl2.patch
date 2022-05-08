@@ -1,0 +1,78 @@
+From 5a78a040489092b59a0073991105df0f4cb83b14 Mon Sep 17 00:00:00 2001
+From: turmary <turmary@126.com>
+Date: Sun, 8 May 2022 21:36:20 +0800
+Subject: [PATCH 3/3] Move: build spl/u-boot-spl with scripts/Makefile.spl2
+ instead of scripts/Makefile.spl
+
+---
+ Makefile                     | 4 ++--
+ arch/arm/cpu/armv8/config.mk | 2 +-
+ scripts/Makefile.spl         | 3 ---
+ scripts/Makefile.spl2        | 1 +
+ 4 files changed, 4 insertions(+), 6 deletions(-)
+ create mode 120000 scripts/Makefile.spl2
+
+diff --git a/Makefile b/Makefile
+index dedea38..bb7b74b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -780,7 +780,7 @@ UBOOTINCLUDE    := \
+ 	-I$(srctree)/arch/$(ARCH)/include \
+ 	-include $(srctree)/include/linux/kconfig.h
+ 
+-NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
++NOSTDINC_FLAGS += -nostdinc -isystem $(shell realpath `$(CC) -print-file-name=include`)
+ 
+ # FIX ME
+ cpp_flags := $(KBUILD_CPPFLAGS) $(PLATFORM_CPPFLAGS) $(UBOOTINCLUDE) \
+@@ -1975,7 +1975,7 @@ spl/u-boot-spl-dtb.hex: spl/u-boot-spl
+ spl/u-boot-spl: tools prepare \
+ 		$(if $(CONFIG_OF_SEPARATE)$(CONFIG_OF_EMBED)$(CONFIG_SPL_OF_PLATDATA),dts/dt.dtb) \
+ 		$(if $(CONFIG_OF_SEPARATE)$(CONFIG_OF_EMBED)$(CONFIG_TPL_OF_PLATDATA),dts/dt.dtb)
+-	$(Q)$(MAKE) obj=spl -f $(srctree)/scripts/Makefile.spl all
++	$(Q)$(MAKE) obj=spl -f $(srctree)/scripts/Makefile.spl2 all
+ 
+ spl/sunxi-spl.bin: spl/u-boot-spl
+ 	@:
+diff --git a/arch/arm/cpu/armv8/config.mk b/arch/arm/cpu/armv8/config.mk
+index 6f90931..1a376b4 100644
+--- a/arch/arm/cpu/armv8/config.mk
++++ b/arch/arm/cpu/armv8/config.mk
+@@ -2,7 +2,7 @@
+ #
+ # (C) Copyright 2002
+ # Gary Jennejohn, DENX Software Engineering, <garyj@denx.de>
+-PLATFORM_RELFLAGS += -fno-common -ffixed-x18
++PLATFORM_RELFLAGS += -ffixed-x18
+ 
+ PF_NO_UNALIGNED := $(call cc-option, -mstrict-align)
+ PLATFORM_CPPFLAGS += $(PF_NO_UNALIGNED)
+diff --git a/scripts/Makefile.spl b/scripts/Makefile.spl
+index 10f869c..9ab5aa7 100644
+--- a/scripts/Makefile.spl
++++ b/scripts/Makefile.spl
+@@ -64,13 +64,10 @@ include $(srctree)/arch/$(ARCH)/Makefile
+ include $(srctree)/scripts/Makefile.lib
+ 
+ # Enable garbage collection of un-used sections for SPL
+-KBUILD_CFLAGS += -ffunction-sections -fdata-sections
+ LDFLAGS_FINAL += --gc-sections
+ 
+ ifeq ($(CONFIG_$(SPL_TPL_)STACKPROTECTOR),y)
+ KBUILD_CFLAGS += -fstack-protector-strong
+-else
+-KBUILD_CFLAGS += -fno-stack-protector
+ endif
+ 
+ # FIX ME
+diff --git a/scripts/Makefile.spl2 b/scripts/Makefile.spl2
+new file mode 120000
+index 0000000..fbefcce
+--- /dev/null
++++ b/scripts/Makefile.spl2
+@@ -0,0 +1 @@
++Makefile.spl
+\ No newline at end of file
+-- 
+2.7.4
+
