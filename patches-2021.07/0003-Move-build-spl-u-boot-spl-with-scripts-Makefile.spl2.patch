@@ -1,19 +1,19 @@
-From 5a78a040489092b59a0073991105df0f4cb83b14 Mon Sep 17 00:00:00 2001
+From 14bf5197eaa20635f7d08a2d7502c458f2b7934b Mon Sep 17 00:00:00 2001
 From: turmary <turmary@126.com>
 Date: Sun, 8 May 2022 21:36:20 +0800
 Subject: [PATCH 3/3] Move: build spl/u-boot-spl with scripts/Makefile.spl2
  instead of scripts/Makefile.spl
 
 ---
- Makefile                     | 4 ++--
+ Makefile                     | 7 ++++---
  arch/arm/cpu/armv8/config.mk | 2 +-
  scripts/Makefile.spl         | 3 ---
  scripts/Makefile.spl2        | 1 +
- 4 files changed, 4 insertions(+), 6 deletions(-)
+ 4 files changed, 6 insertions(+), 7 deletions(-)
  create mode 120000 scripts/Makefile.spl2
 
 diff --git a/Makefile b/Makefile
-index dedea38..bb7b74b 100644
+index dedea38..f1453ab 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -780,7 +780,7 @@ UBOOTINCLUDE    := \
@@ -25,7 +25,17 @@ index dedea38..bb7b74b 100644
  
  # FIX ME
  cpp_flags := $(KBUILD_CPPFLAGS) $(PLATFORM_CPPFLAGS) $(UBOOTINCLUDE) \
-@@ -1975,7 +1975,7 @@ spl/u-boot-spl-dtb.hex: spl/u-boot-spl
+@@ -861,7 +861,8 @@ u-boot-main := $(libs-y)
+ ifeq ($(CONFIG_USE_PRIVATE_LIBGCC),y)
+ PLATFORM_LIBGCC = arch/$(ARCH)/lib/lib.a
+ else
+-PLATFORM_LIBGCC := -L $(shell dirname `$(CC) $(c_flags) -print-libgcc-file-name`) -lgcc
++PLATFORM_LIBGCC := $(shell dirname `$(CC) $(c_flags) -print-libgcc-file-name`)
++PLATFORM_LIBGCC := -L $(shell realpath `echo $(PLATFORM_LIBGCC)`) -lgcc
+ endif
+ PLATFORM_LIBS += $(PLATFORM_LIBGCC)
+ 
+@@ -1975,7 +1976,7 @@ spl/u-boot-spl-dtb.hex: spl/u-boot-spl
  spl/u-boot-spl: tools prepare \
  		$(if $(CONFIG_OF_SEPARATE)$(CONFIG_OF_EMBED)$(CONFIG_SPL_OF_PLATDATA),dts/dt.dtb) \
  		$(if $(CONFIG_OF_SEPARATE)$(CONFIG_OF_EMBED)$(CONFIG_TPL_OF_PLATDATA),dts/dt.dtb)
