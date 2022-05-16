@@ -122,12 +122,12 @@ files="${files} tools/scripts/define2mk.sed"
 
 # Prepare targets
 files="${files} include/config/auto.conf"
-files="${files} include/autoconf.mk"
-files="${files} tpl/include/autoconf.mk"
-files="${files} spl/include/autoconf.mk"
+# files="${files} include/autoconf.mk"
+# files="${files} tpl/include/autoconf.mk"
+# files="${files} spl/include/autoconf.mk"
 files="${files} include/generated/autoconf.h"
-files="${files} include/generated/asm-offsets.h"
 files="${files} include/generated/generic-asm-offsets.h"
+# files="${files} include/generated/asm-offsets.h"
 
 # echo files="$files"
 # exit 0
@@ -187,7 +187,7 @@ done
 
 echo "### INCLUDES"
 # translate to real path
-for d in $(echo "${!includes[@]}"); do
+for d in "${!includes[@]}"; do
 	d=$(realpath --relative-to=. "$d")
 	includes2["$d"]=1
 done
@@ -202,8 +202,8 @@ done
 	cp -a --parents arch/arm/include/asm/arch "$PTH_DIR"
 }
 
-touch "$PTH_DIR/.config"
 touch "$PTH_DIR/include/config/auto.conf"
 touch "$PTH_DIR/include/config/auto.conf.cmd"
+touch "$PTH_DIR/.config"
 
 
