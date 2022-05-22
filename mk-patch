@@ -50,6 +50,8 @@ files="${files} $(find spl -name '*.o' )"
 # files="${files} lib/tiny-printf.c"
 files="${files} include/u-boot/u-boot.lds.h"
 
+files="${files} drivers/serial/serial.c"
+files="${files} drivers/serial/serial_ns16550.c"
 
 files="${files} $(find arch/arm/dts -name "*\.dtb")"
 
@@ -87,6 +89,13 @@ files="${files} scripts/gcc-stack-usage.sh"
 files="${files} scripts/setlocalversion"
 files="${files} scripts/dtc/dtc-lexer.l"
 files="${files} scripts/dtc/dtc-parser.y"
+files="${files} scripts/dtc/libfdt/Makefile.libfdt"
+
+# OF_PLATDATA required
+files="${files} $(find tools/patman -maxdepth 1 -type f ! -name "_*" )"
+files="${files} $(find tools/dtoc -maxdepth 1 \( -type f -o -type l \) ! \( -name "test*" -o -name "_*" \))"
+files="${files} scripts/dtc/pylibfdt/libfdt.i_shipped"
+files="${files} scripts/dtc/pylibfdt/setup.py"
 
 # Makefiles
 files="${files} config.mk"
@@ -201,6 +210,9 @@ done
 	# (cd "$PTH_DIR/arch/arm/include/asm"; ln -sr arch-rk3399 arch)
 	cp -a --parents arch/arm/include/asm/arch "$PTH_DIR"
 }
+
+cp -a --parents tools/dtoc/dtoc "$PTH_DIR"
+cp -a --parents tools/patman/patman "$PTH_DIR"
 
 touch "$PTH_DIR/include/config/auto.conf"
 touch "$PTH_DIR/include/config/auto.conf.cmd"
