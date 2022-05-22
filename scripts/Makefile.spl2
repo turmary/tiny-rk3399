@@ -24,6 +24,7 @@ SPL_NAME := spl
 
 export SPL_NAME
 
+SPL_ := SPL_
 SPL_TPL_ := SPL_
 
 ifeq ($(obj)$(CONFIG_SUPPORT_SPL),spl)
