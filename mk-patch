@@ -92,8 +92,8 @@ files="${files} scripts/dtc/dtc-parser.y"
 files="${files} scripts/dtc/libfdt/Makefile.libfdt"
 
 # OF_PLATDATA required
-files="${files} $(find tools/patman -maxdepth 1 -type f ! -name "_*" )"
-files="${files} $(find tools/dtoc -maxdepth 1 \( -type f -o -type l \) ! \( -name "test*" -o -name "_*" \))"
+files="${files} $(find tools/patman -maxdepth 1 \( -type f -o -type l \) ! -name "_*" )"
+files="${files} $(find tools/dtoc   -maxdepth 1 \( -type f -o -type l \) ! \( -name "test*" -o -name "_*" \))"
 files="${files} scripts/dtc/pylibfdt/libfdt.i_shipped"
 files="${files} scripts/dtc/pylibfdt/setup.py"
 
@@ -137,6 +137,7 @@ files="${files} include/config/auto.conf"
 files="${files} include/generated/autoconf.h"
 files="${files} include/generated/generic-asm-offsets.h"
 # files="${files} include/generated/asm-offsets.h"
+files="${files} arch/arm/include/asm/arch"
 
 # echo files="$files"
 # exit 0
@@ -145,9 +146,19 @@ function copy_file() {
 	full=$(realpath --relative-to=. "$1")
 	[ -s "$full" ] || return 0
 
-	[ -f "$PTH_DIR/$full" ] || {
+	[ -e "$PTH_DIR/$full" ] || {
 		cp -a --parents "$full" "$PTH_DIR" && \
 		echo "$full" --\> "$PTH_DIR/$full"
+	}
+}
+
+function copy_link() {
+	full="$1"
+	[ -e "$full" ] || return 0
+
+	[ -e "$PTH_DIR/$full" ] || {
+		cp -a --parents "$full" "$PTH_DIR" && \
+		echo "$full" -\>\> "$PTH_DIR/$full"
 	}
 }
 
@@ -169,6 +180,7 @@ for i in $files; do
 
 	[ "${name:0-2}" = ".o" -o "${name:0-4}" = ".dtb" ] || {
 		[ -s "$dir/$name" ] && copy_file "$dir/$name"
+		[ -L "$dir/$name" ] && copy_link "$dir/$name"
 		continue
 	}
 
@@ -206,13 +218,10 @@ for i in $(echo "${!includes2[@]}" | tr ' ' '\n' | sort); do
 done
 
 # find "$PTH_DIR/" -type f -size 0 -exec rm -f {} \;
-[ -d "$PTH_DIR/arch/arm/include/asm/arch" ] || {
+# [ -d "$PTH_DIR/arch/arm/include/asm/arch" ] || {
 	# (cd "$PTH_DIR/arch/arm/include/asm"; ln -sr arch-rk3399 arch)
-	cp -a --parents arch/arm/include/asm/arch "$PTH_DIR"
-}
-
-cp -a --parents tools/dtoc/dtoc "$PTH_DIR"
-cp -a --parents tools/patman/patman "$PTH_DIR"
+#	cp -a --parents arch/arm/include/asm/arch "$PTH_DIR"
+#}
 
 touch "$PTH_DIR/include/config/auto.conf"
 touch "$PTH_DIR/include/config/auto.conf.cmd"
