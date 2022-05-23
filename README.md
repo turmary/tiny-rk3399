@@ -9,7 +9,7 @@
   git am ../tiny-rk3399/patches-2021.07/*.patch
   make -C . ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- firefly-rk3399_defconfig
   make -C . ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- idbloader.img
-  (cd ../tiny-rk3399; git add mk-patch; git clean -df .)
+  (cd ../tiny-rk3399; git add mk-patch; git clean -dfx .)
   ../tiny-rk3399/mk-patch
   make -C ../tiny-rk3399 ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- idbloader.img # KCPPFLAGS="-DDEBUG=1"
   ```

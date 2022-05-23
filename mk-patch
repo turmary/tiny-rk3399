@@ -5,7 +5,7 @@
 	cd u-boot
 	make -C . ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- firefly-rk3399_defconfig
 	make -C . ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- idbloader.img
-	(cd ../tiny-rk3399; git add mk-patch; git clean -df .)
+	(cd ../tiny-rk3399; git add mk-patch; git clean -dfx .)
 	../tiny-rk3399/mk-patch
 	make -C ../tiny-rk3399 ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- idbloader.img
 	EOF
@@ -223,8 +223,38 @@ done
 #	cp -a --parents arch/arm/include/asm/arch "$PTH_DIR"
 #}
 
-touch "$PTH_DIR/include/config/auto.conf"
 touch "$PTH_DIR/include/config/auto.conf.cmd"
 touch "$PTH_DIR/.config"
 
+echo "### PATCHES MANUALLY"
+cd "$PTH_DIR"
+patch -r /dev/null -fp1 <<\PATCH_EOF
+From 7367b2ca5ad50c1b51b4243c9b26baea6387b874 Mon Sep 17 00:00:00 2001
+From: turmary <turmary@126.com>
+Date: Mon, 23 May 2022 22:59:32 +0800
+Subject: [PATCH] Add: a config CONFIG_CMD_NVEDIT to disable nvedit.o's
+ building
+
+---
+ cmd/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmd/Makefile b/cmd/Makefile
+index 9d10e07..9619e19 100644
+--- a/cmd/Makefile
++++ b/cmd/Makefile
+@@ -210,7 +210,7 @@ endif # !CONFIG_SPL_BUILD
+ obj-$(CONFIG_$(SPL_)CMD_TLV_EEPROM) += tlv_eeprom.o
+ 
+ # core command
+-obj-y += nvedit.o
++obj-$(CONFIG_CMD_NVEDIT) += nvedit.o
+ 
+ obj-$(CONFIG_CMD_BCM_EXT_UTILS) += broadcom/
+ 
+-- 
+2.7.4
+PATCH_EOF
+
+exit 0
 
