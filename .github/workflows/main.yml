@@ -32,12 +32,15 @@ jobs:
           path: u-boot
           ref: v2021.07
 
-      - name: Install GCC
-        uses: awalsh128/cache-apt-pkgs-action@v1
-        with:
-          packages: gcc-aarch64-linux-gnu
-          version: 1.0
-          refresh: true # Force refresh / upgrade v1.0 cache.
+      - name: Install aarch64 gcc
+        #uses: awalsh128/cache-apt-pkgs-action@v1
+        #with:
+        #  packages: gcc-aarch64-linux-gnu gcc-9-aarch64-linux-gnu-base binutils-aarch64-linux-gnu cpp-9-aarch64-linux-gnu cpp-aarch64-linux-gnu libc6-arm64-cross gcc-9-cross-base gcc-10-cross-base linux-libc-dev-arm64-cross libgcc-s1-arm64-cross libatomic1-arm64-cross liblsan0-arm64-cross libgomp1-arm64-cross libtsan0-arm64-cross libc6-dev-arm64-cross libasan5-arm64-cross libstdc++6-arm64-cross libitm1-arm64-cross libubsan1-arm64-cross libgcc-9-dev-arm64-cross gcc-9-aarch64-linux-gnu
+        #  version: 1.0
+        #  refresh: true # Force refresh / upgrade v1.0 cache.
+        run: |
+          sudo apt-get update
+          sudo apt-get install gcc-aarch64-linux-gnu
 
       # Patch and conf the u-boot
       - name: Patch and conf the u-boot
@@ -52,7 +55,11 @@ jobs:
       # Preapre source and then build
       - name: build tiny-rk3399
         run: |
-          cd u-boot
-          ../mk-patch
-          cd -
+          (cd u-boot; ../mk-patch)
           make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- idbloader.img # KCPPFLAGS="-DDEBUG=1"
+
+      - name: Save idbloader artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: idbloader
+          path: idbloader.img
