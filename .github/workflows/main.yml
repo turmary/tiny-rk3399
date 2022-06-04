@@ -1,0 +1,58 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-20.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Check out u-boot repo
+        uses: actions/checkout@v3
+        with:
+          repository: u-boot/u-boot
+          path: u-boot
+          ref: v2021.07
+
+      - name: Install GCC
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: gcc-aarch64-linux-gnu
+          version: 1.0
+          refresh: true # Force refresh / upgrade v1.0 cache.
+
+      # Patch and conf the u-boot
+      - name: Patch and conf the u-boot
+        run: |
+          cd u-boot
+          git config user.name turmary
+          git config user.email turmary@126.com
+          git am ../patches-2021.07/*.patch
+          make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- firefly-rk3399_defconfig
+          make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- idbloader.img
+
+      # Preapre source and then build
+      - name: build tiny-rk3399
+        run: |
+          cd u-boot
+          ../mk-patch
+          cd -
+          make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- idbloader.img # KCPPFLAGS="-DDEBUG=1"
