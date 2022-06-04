@@ -2,6 +2,12 @@
 
   This project will retrieve all TPL & SPL files from recently U-Boot
 
+## Build Status
+
+Build Type       |    Status     |
+-----------      | --------------|
+[CI (Linux)](https://github.com/turmary/tiny-rk3399/actions/workflows/main.yml)      | ![CI](https://github.com/turmary/tiny-rk3399/actions/workflows/main.yml/badge.svg) |
+
 # Usage
   ```bash
   cd u-boot; git checkout -b v2021.07-rk3399 v2021.07
