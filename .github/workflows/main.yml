@@ -23,10 +23,10 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Check out u-boot repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: u-boot/u-boot
           path: u-boot
@@ -66,7 +66,7 @@ jobs:
           make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- idbloader.img # KCPPFLAGS="-DDEBUG=1"
 
       - name: Save idbloader artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: idbloader
           path: idbloader.img
