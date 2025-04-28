@@ -1,0 +1,137 @@
+From 8739314ed330a940e35b95e83c69d6b0a0900aa0 Mon Sep 17 00:00:00 2001
+From: turmary <turmary@126.com>
+Date: Mon, 28 Apr 2025 22:23:51 +0800
+Subject: [PATCH 5/5] Fixed: fdt_val_t* warning in conv_of_plat
+
+---
+ drivers/ram/rockchip/sdram_rk3399.c |  2 +-
+ include/command.h                   |  4 ++--
+ scripts/dtc/pylibfdt/setup.py       |  2 +-
+ tools/dtoc/src_scan.py              | 20 +++++++++++++++-----
+ 4 files changed, 19 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/ram/rockchip/sdram_rk3399.c b/drivers/ram/rockchip/sdram_rk3399.c
+index a83a670b322..ec7265d4a0d 100644
+--- a/drivers/ram/rockchip/sdram_rk3399.c
++++ b/drivers/ram/rockchip/sdram_rk3399.c
+@@ -3040,7 +3040,7 @@ static int conv_of_plat(struct udevice *dev)
+ 	struct dtd_rockchip_rk3399_dmc *dtplat = &plat->dtplat;
+ 	int ret;
+ 
+-	ret = regmap_init_mem_plat(dev, dtplat->reg,
++	ret = regmap_init_mem_plat(dev, (fdt_val_t*)dtplat->reg,
+ 				   ARRAY_SIZE(dtplat->reg) / 2, &plat->map);
+ 	if (ret)
+ 		return ret;
+diff --git a/include/command.h b/include/command.h
+index 137cfbc3231..85321f53bb2 100644
+--- a/include/command.h
++++ b/include/command.h
+@@ -231,8 +231,8 @@ enum command_ret_t {
+  *			number of ticks the command took to complete.
+  * @return 0 if the command succeeded, 1 if it failed
+  */
+-int cmd_process(int flag, int argc, char *const argv[], int *repeatable,
+-		unsigned long *ticks);
++enum command_ret_t cmd_process(int flag, int argc, char *const argv[], int *repeatable,
++		ulong *ticks);
+ 
+ void fixup_cmdtable(struct cmd_tbl *cmdtp, int size);
+ 
+diff --git a/scripts/dtc/pylibfdt/setup.py b/scripts/dtc/pylibfdt/setup.py
+index 992cdec30f5..0d01f772ea5 100755
+--- a/scripts/dtc/pylibfdt/setup.py
++++ b/scripts/dtc/pylibfdt/setup.py
+@@ -24,7 +24,7 @@ import re
+ import sys
+ 
+ # Decodes a Makefile assignment line into key and value (and plus for +=)
+-RE_KEY_VALUE = re.compile('(?P<key>\w+) *(?P<plus>[+])?= *(?P<value>.*)$')
++RE_KEY_VALUE = re.compile(r'(?P<key>\w+) *(?P<plus>[+])?= *(?P<value>.*)$')
+ 
+ 
+ def ParseMakefile(fname):
+diff --git a/tools/dtoc/src_scan.py b/tools/dtoc/src_scan.py
+index 1dbb56712a3..51a98f00b41 100644
+--- a/tools/dtoc/src_scan.py
++++ b/tools/dtoc/src_scan.py
+@@ -255,6 +255,8 @@ class Scanner:
+             compat_list_c = ['root_driver']
+         else:
+             compat_list_c = get_compat_name(node)
++        # print("_drivers = {}".format(self._drivers.keys()))
++        # print("_driver_aliases = {}".format(self._driver_aliases))
+ 
+         for compat_c in compat_list_c:
+             if not compat_c in self._drivers.keys():
+@@ -265,6 +267,7 @@ class Scanner:
+             aliases_c = compat_list_c
+             if compat_c in aliases_c:
+                 aliases_c.remove(compat_c)
++            # print("compat = {}, aliases = {}".format(compat_c, aliases_c))
+             return compat_c, aliases_c
+ 
+         self._missing_drivers.add(compat_list_c[0])
+@@ -283,8 +286,8 @@ class Scanner:
+         """
+         structs = {}
+ 
+-        re_struct = re.compile('^struct ([a-z0-9_]+) {$')
+-        re_asm = re.compile('../arch/[a-z0-9]+/include/asm/(.*)')
++        re_struct = re.compile(r'^struct ([a-z0-9_]+) {$')
++        re_asm = re.compile(r'../arch/[a-z0-9]+/include/asm/(.*)')
+         prefix = ''
+         for line in buff.splitlines():
+             # Handle line continuation
+@@ -447,6 +450,9 @@ class Scanner:
+         re_compat = re.compile(r'{\s*.compatible\s*=\s*"(.*)"\s*'
+                                r'(,\s*.data\s*=\s*(\S*))?\s*},')
+ 
++        # Collect the driver name
++        re_name = re.compile(r'\s*.name\s*=\s*"(.*)"\s*')
++
+         # This is a dict of compatible strings that were found:
+         #    key: Compatible string, e.g. 'rockchip,rk3288-grf'
+         #    value: Driver data, e,g, 'ROCKCHIP_SYSCON_GRF', or None
+@@ -460,10 +466,10 @@ class Scanner:
+ 
+         # Matches the references to the udevice_id list
+         re_of_match = re.compile(
+-            r'\.of_match\s*=\s*(of_match_ptr\()?([a-z0-9_]+)(\))?,')
++            r'\.of_match\s*=\s*(of_match_ptr\()?([a-z0-9_]+)(\s*\+\s*[0-9]+)?(\))?,')
+ 
+-        re_phase = re.compile('^\s*DM_PHASE\((.*)\).*$')
+-        re_hdr = re.compile('^\s*DM_HEADER\((.*)\).*$')
++        re_phase = re.compile(r'^\s*DM_PHASE\((.*)\).*$')
++        re_hdr = re.compile(r'^\s*DM_HEADER\((.*)\).*$')
+         re_alias = re.compile(r'DM_DRIVER_ALIAS\(\s*(\w+)\s*,\s*(\w+)\s*\)')
+ 
+         # Matches the struct name for priv, plat
+@@ -494,6 +500,7 @@ class Scanner:
+                 m_cpriv = re_child_priv.match(line)
+                 m_phase = re_phase.match(line)
+                 m_hdr = re_hdr.match(line)
++                m_name = re_name.match(line)
+                 if m_priv:
+                     driver.priv = m_priv.group(1)
+                 elif m_plat:
+@@ -510,6 +517,8 @@ class Scanner:
+                     driver.phase = m_phase.group(1)
+                 elif m_hdr:
+                     driver.headers.append(m_hdr.group(1))
++                elif m_name:
++                    driver.name = m_name.group(1)
+                 elif '};' in line:
+                     is_root = driver.name == 'root_driver'
+                     if driver.uclass_id and (compat or is_root):
+@@ -577,6 +586,7 @@ class Scanner:
+ 
+     def show_warnings(self):
+         """Show any warnings that have been collected"""
++        # import traceback; traceback.print_stack()
+         for name in sorted(list(self._missing_drivers)):
+             print('WARNING: the driver %s was not found in the driver list'
+                   % name)
+-- 
+2.25.1
+
