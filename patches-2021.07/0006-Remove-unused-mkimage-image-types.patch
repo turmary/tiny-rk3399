@@ -1,0 +1,100 @@
+From 1242b5388ca89630224bfce724603a2e094a775d Mon Sep 17 00:00:00 2001
+From: turmary <turmary@126.com>
+Date: Wed, 30 Apr 2025 23:53:52 +0800
+Subject: [PATCH 6/6] Remove: unused mkimage image types
+
+---
+ tools/Makefile  | 21 +--------------------
+ tools/mkimage.c | 24 ------------------------
+ 2 files changed, 1 insertion(+), 44 deletions(-)
+
+diff --git a/tools/Makefile b/tools/Makefile
+index d020c55d664..7fd06b62059 100644
+--- a/tools/Makefile
++++ b/tools/Makefile
+@@ -82,8 +82,7 @@ LIBCRYPTO_OBJS-$(CONFIG_FIT_SIGNATURE) := $(addprefix lib/, \
+ ROCKCHIP_OBS = lib/rc4.o rkcommon.o rkimage.o rksd.o rkspi.o
+ 
+ # common objs for dumpimage and mkimage
+-dumpimage-mkimage-objs := aisimage.o \
+-			atmelimage.o \
++dumpimage-mkimage-objs := \
+ 			$(FIT_OBJS-y) \
+ 			$(FIT_SIG_OBJS-y) \
+ 			$(FIT_CIPHER_OBJS-y) \
+@@ -95,37 +94,19 @@ dumpimage-mkimage-objs := aisimage.o \
+ 			lib/fdtdec.o \
+ 			common/image.o \
+ 			imagetool.o \
+-			imximage.o \
+-			imx8image.o \
+-			imx8mimage.o \
+-			kwbimage.o \
+ 			lib/md5.o \
+-			lpc32xximage.o \
+-			mxsimage.o \
+-			omapimage.o \
+ 			os_support.o \
+-			pblimage.o \
+-			pbl_crc32.o \
+-			vybridimage.o \
+-			stm32image.o \
+ 			$(ROCKCHIP_OBS) \
+-			socfpgaimage.o \
+-			sunxi_egon.o \
+ 			lib/crc16.o \
+ 			lib/hash-checksum.o \
+ 			lib/sha1.o \
+ 			lib/sha256.o \
+ 			lib/sha512.o \
+ 			common/hash.o \
+-			ublimage.o \
+-			zynqimage.o \
+-			zynqmpimage.o \
+-			zynqmpbif.o \
+ 			$(LIBCRYPTO_OBJS-y) \
+ 			$(LIBFDT_OBJS) \
+ 			gpimage.o \
+ 			gpimage-common.o \
+-			mtk_image.o \
+ 			$(ECDSA_OBJS-y) \
+ 			$(RSA_OBJS-y) \
+ 			$(AES_OBJS-y)
+diff --git a/tools/mkimage.c b/tools/mkimage.c
+index cc7b242faf2..8e7805c1ea3 100644
+--- a/tools/mkimage.c
++++ b/tools/mkimage.c
+@@ -544,30 +544,6 @@ int main(int argc, char **argv)
+ 					break;
+ 				}
+ 			}
+-		} else if (params.type == IH_TYPE_PBLIMAGE) {
+-			/* PBL has special Image format, implements its' own */
+-			pbl_load_uboot(ifd, &params);
+-		} else if (params.type == IH_TYPE_ZYNQMPBIF) {
+-			/* Image file is meta, walk through actual targets */
+-			int ret;
+-
+-			ret = zynqmpbif_copy_image(ifd, &params);
+-			if (ret)
+-				return ret;
+-		} else if (params.type == IH_TYPE_IMX8IMAGE) {
+-			/* i.MX8/8X has special Image format */
+-			int ret;
+-
+-			ret = imx8image_copy_image(ifd, &params);
+-			if (ret)
+-				return ret;
+-		} else if (params.type == IH_TYPE_IMX8MIMAGE) {
+-			/* i.MX8M has special Image format */
+-			int ret;
+-
+-			ret = imx8mimage_copy_image(ifd, &params);
+-			if (ret)
+-				return ret;
+ 		} else if ((params.type == IH_TYPE_RKSD) ||
+ 				(params.type == IH_TYPE_RKSPI)) {
+ 			/* Rockchip has special Image format */
+-- 
+2.25.1
+
