@@ -1,0 +1,25 @@
+From 9b2a131034d2179ebb935c7f4925a255301bea7d Mon Sep 17 00:00:00 2001
+From: turmary <turmary@126.com>
+Date: Wed, 14 May 2025 23:29:00 +0800
+Subject: [PATCH 7/7] Remove: compiling for cpu-dt.c
+
+---
+ arch/arm/cpu/armv8/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/cpu/armv8/Makefile b/arch/arm/cpu/armv8/Makefile
+index d85ddde430a..3e1de5f3ba8 100644
+--- a/arch/arm/cpu/armv8/Makefile
++++ b/arch/arm/cpu/armv8/Makefile
+@@ -24,7 +24,7 @@ obj-y	+= transition.o
+ ifndef CONFIG_ARMV8_PSCI
+ obj-y	+= fwcall.o
+ endif
+-obj-y	+= cpu-dt.o
++obj-$(CONFIG_ARMV8_SEC_FIRMWARE_SUPPORT)	+= cpu-dt.o
+ obj-$(CONFIG_ARM_SMCCC)		+= smccc-call.o
+ 
+ ifndef CONFIG_SPL_BUILD
+-- 
+2.25.1
+
