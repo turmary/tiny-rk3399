@@ -19,3 +19,4 @@ Build Type       |    Status     |
   ../tiny-rk3399/mk-patch
   make -C ../tiny-rk3399 ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- idbloader.img # KCPPFLAGS="-DDEBUG=1"
   ```
+
