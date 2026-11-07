@@ -43,7 +43,7 @@ cpp_flags := $(KBUILD_CPPFLAGS) $(PLATFORM_CPPFLAGS) $(UBOOTINCLUDE) \
 							$(NOSTDINC_FLAGS)
 c_flags := $(KBUILD_CFLAGS) $(cpp_flags)
 
-libs-y += $(if $(BOARDDIR),board/$(BOARDDIR)/)
+# libs-y += $(if $(BOARDDIR),board/$(BOARDDIR)/)
 
 libs-$(CONFIG_SPL_FRAMEWORK) += common/spl/
 libs-y += common/init/

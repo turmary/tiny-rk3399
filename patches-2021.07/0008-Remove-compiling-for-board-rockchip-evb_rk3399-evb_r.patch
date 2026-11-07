@@ -1,0 +1,37 @@
+From fc7c0fdea97f40b914ba1ddf19dc82dbcc8471ff Mon Sep 17 00:00:00 2001
+From: turmary <turmary@126.com>
+Date: Sat, 7 Nov 2026 19:52:59 +0800
+Subject: [PATCH 8/8] Remove: compiling for
+ board/rockchip/evb_rk3399/evb_rk3399.c
+
+---
+ board/rockchip/evb_rk3399/Makefile | 2 +-
+ scripts/Makefile.spl               | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/board/rockchip/evb_rk3399/Makefile b/board/rockchip/evb_rk3399/Makefile
+index aaa51c212e5..ec039903cfa 100644
+--- a/board/rockchip/evb_rk3399/Makefile
++++ b/board/rockchip/evb_rk3399/Makefile
+@@ -4,4 +4,4 @@
+ # SPDX-License-Identifier:     GPL-2.0+
+ #
+ 
+-obj-y	+= evb-rk3399.o
++# obj-y	+= evb-rk3399.o
+diff --git a/scripts/Makefile.spl b/scripts/Makefile.spl
+index 9ab5aa75a20..ed4408605f2 100644
+--- a/scripts/Makefile.spl
++++ b/scripts/Makefile.spl
+@@ -77,7 +77,7 @@ c_flags := $(KBUILD_CFLAGS) $(cpp_flags)
+ 
+ HAVE_VENDOR_COMMON_LIB = $(if $(wildcard $(srctree)/board/$(VENDOR)/common/Makefile),y,n)
+ 
+-libs-y += $(if $(BOARDDIR),board/$(BOARDDIR)/)
++# libs-y += $(if $(BOARDDIR),board/$(BOARDDIR)/)
+ libs-$(HAVE_VENDOR_COMMON_LIB) += board/$(VENDOR)/common/
+ 
+ ifeq ($(CONFIG_TPL_BUILD),y)
+-- 
+2.25.1
+
