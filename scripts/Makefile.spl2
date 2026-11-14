@@ -35,9 +35,6 @@ include $(srctree)/config.mk
 include $(srctree)/arch/$(ARCH)/Makefile
 include $(srctree)/scripts/Makefile.lib
 
-# Enable garbage collection of un-used sections for SPL
-LDFLAGS_FINAL += --gc-sections
-
 # FIX ME
 cpp_flags := $(KBUILD_CPPFLAGS) $(PLATFORM_CPPFLAGS) $(UBOOTINCLUDE) \
 							$(NOSTDINC_FLAGS)
@@ -49,10 +46,10 @@ libs-$(CONFIG_SPL_FRAMEWORK) += common/spl/
 libs-y += common/init/
 
 # Special handling for a few options which support SPL/TPL
-libs-$(CONFIG_SPL_LIBCOMMON_SUPPORT) += common/ cmd/ env/
+libs-$(CONFIG_SPL_LIBCOMMON_SUPPORT) += common/ # cmd/ env/
 libs-$(CONFIG_SPL_LIBGENERIC_SUPPORT) += lib/
 ifdef CONFIG_SPL_FRAMEWORK
-libs-$(CONFIG_PARTITIONS) += disk/
+# libs-$(CONFIG_PARTITIONS) += disk/
 endif
 
 libs-y += drivers/

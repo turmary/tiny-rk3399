@@ -206,6 +206,10 @@ done
 touch "$PTH_DIR/include/config/auto.conf.cmd"
 touch "$PTH_DIR/.config"
 
+exit 0
+
+
+
 echo "### PATCHES MANUALLY"
 cd "$PTH_DIR"
 patch -r /dev/null -fp1 <<\PATCH_EOF

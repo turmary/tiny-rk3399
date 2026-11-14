@@ -1,0 +1,43 @@
+From da9d882268e67711a9a6760a2861a323f704c19a Mon Sep 17 00:00:00 2001
+From: turmary <turmary@126.com>
+Date: Sat, 14 Nov 2026 09:20:58 +0800
+Subject: [PATCH 9/9] Remove: tpl/spl not require cmd/ env/
+
+---
+ lib/Makefile         | 2 +-
+ scripts/Makefile.spl | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lib/Makefile b/lib/Makefile
+index b4795a62a0d..8b8ad09a0b9 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -132,7 +132,7 @@ obj-$(CONFIG_OID_REGISTRY) += oid_registry.o
+ obj-$(CONFIG_SSCANF) += sscanf.o
+ endif
+ 
+-obj-y += date.o
++obj-$(CONFIG_LIB_DATE) += date.o
+ obj-$(CONFIG_LIB_ELF) += elf.o
+ 
+ #
+diff --git a/scripts/Makefile.spl b/scripts/Makefile.spl
+index ed4408605f2..fa0de75e871 100644
+--- a/scripts/Makefile.spl
++++ b/scripts/Makefile.spl
+@@ -89,10 +89,10 @@ libs-y += common/init/
+ 
+ # Special handling for a few options which support SPL/TPL
+ ifeq ($(CONFIG_TPL_BUILD),y)
+-libs-$(CONFIG_TPL_LIBCOMMON_SUPPORT) += common/ cmd/ env/
++libs-$(CONFIG_TPL_LIBCOMMON_SUPPORT) += common/ # cmd/ env/
+ libs-$(CONFIG_TPL_LIBGENERIC_SUPPORT) += lib/
+ else
+-libs-$(CONFIG_SPL_LIBCOMMON_SUPPORT) += common/ cmd/ env/
++libs-$(CONFIG_SPL_LIBCOMMON_SUPPORT) += common/ # cmd/ env/
+ libs-$(CONFIG_SPL_LIBGENERIC_SUPPORT) += lib/
+ ifdef CONFIG_SPL_FRAMEWORK
+ libs-$(CONFIG_PARTITIONS) += disk/
+-- 
+2.25.1
+
